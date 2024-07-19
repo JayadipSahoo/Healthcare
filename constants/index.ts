@@ -59,7 +59,7 @@ export const Doctors = [
   },
   {
     image: "/assets/images/gori.png",
-    name: "Dr Gori Babu",
+    name: "Gori Babu",
   },
   {
     image: "/assets/images/sassy.png",
