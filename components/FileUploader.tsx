@@ -9,9 +9,14 @@ import { convertFileToUrl } from "@/lib/utils";
 type FileUploaderProps = {
   files: File[] | undefined;
   onChange: (files: File[]) => void;
+  variant?: "default" | "compact";
 };
 
-export const FileUploader = ({ files, onChange }: FileUploaderProps) => {
+export const FileUploader = ({
+  files,
+  onChange,
+  variant = "default",
+}: FileUploaderProps) => {
   const onDrop = useCallback((acceptedFiles: File[]) => {
     onChange(acceptedFiles);
   }, []);
@@ -19,7 +24,10 @@ export const FileUploader = ({ files, onChange }: FileUploaderProps) => {
   const { getRootProps, getInputProps } = useDropzone({ onDrop });
 
   return (
-    <div {...getRootProps()} className="file-upload">
+    <div
+      {...getRootProps()}
+      className={variant === "compact" ? "file-upload file-upload-compact" : "file-upload"}
+    >
       <input {...getInputProps()} />
       {files && files?.length > 0 ? (
         <Image

@@ -110,3 +110,22 @@ export const getPatient = async (userId: string) => {
     );
   }
 };
+
+// GET ALL PATIENTS (for Search Records)
+export const getAllPatients = async () => {
+  try {
+    const result = await databases.listDocuments(
+      DATABASE_ID!,
+      PATIENT_COLLECTION_ID!,
+      [Query.orderDesc("$createdAt")]
+    );
+
+    return parseStringify(result.documents);
+  } catch (error) {
+    console.error(
+      "An error occurred while retrieving patient records:",
+      error
+    );
+    return [];
+  }
+};

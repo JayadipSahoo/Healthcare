@@ -10,7 +10,21 @@ import { Appointment } from "@/types/appwrite.types";
 import { AppointmentModal } from "../AppointmentModal";
 import { StatusBadge } from "../StatusBadge";
 
-export const columns: ColumnDef<Appointment>[] = [
+type DoctorOption = { name: string; image?: string };
+
+const getDoctorDisplay = (
+  primaryPhysician: string,
+  doctors: DoctorOption[]
+) => {
+  const doctor =
+    doctors.find((d) => d.name === primaryPhysician) ||
+    Doctors.find((d) => d.name === primaryPhysician);
+  return doctor;
+};
+
+export const getAppointmentColumns = (
+  doctors: DoctorOption[] = []
+): ColumnDef<Appointment>[] => [
   {
     header: "#",
     cell: ({ row }) => {
@@ -54,21 +68,29 @@ export const columns: ColumnDef<Appointment>[] = [
     header: "Doctor",
     cell: ({ row }) => {
       const appointment = row.original;
-
-      const doctor = Doctors.find(
-        (doctor) => doctor.name === appointment.primaryPhysician
+      const doctor = getDoctorDisplay(
+        appointment.primaryPhysician,
+        doctors
       );
 
       return (
         <div className="flex items-center gap-3">
-          <Image
-            src={doctor?.image!}
-            alt="doctor"
-            width={100}
-            height={100}
-            className="size-8"
-          />
-          <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+          {doctor?.image ? (
+            <Image
+              src={doctor.image}
+              alt="doctor"
+              width={100}
+              height={100}
+              className="size-8 rounded-full object-cover"
+            />
+          ) : (
+            <div className="flex size-8 items-center justify-center rounded-full bg-dark-400 text-12-medium">
+              Dr
+            </div>
+          )}
+          <p className="whitespace-nowrap">
+            {doctor?.name ? `Dr. ${doctor.name}` : appointment.primaryPhysician}
+          </p>
         </div>
       );
     },
@@ -88,6 +110,7 @@ export const columns: ColumnDef<Appointment>[] = [
             type="schedule"
             title="Schedule Appointment"
             description="Please confirm the following details to schedule."
+            doctors={doctors}
           />
           <AppointmentModal
             patientId={appointment.patient.$id}
@@ -96,9 +119,12 @@ export const columns: ColumnDef<Appointment>[] = [
             type="cancel"
             title="Cancel Appointment"
             description="Are you sure you want to cancel your appointment?"
+            doctors={doctors}
           />
         </div>
       );
     },
   },
 ];
+
+export const columns = getAppointmentColumns();

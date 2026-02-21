@@ -26,7 +26,16 @@ import CustomFormField, { FormFieldType } from "../CustomFormField";
 import { FileUploader } from "../FileUploader";
 import SubmitButton from "../SubmitButton";
 
-const RegisterForm = ({ user }: { user: User }) => {
+type DoctorOption = { name: string; image?: string };
+
+const RegisterForm = ({
+  user,
+  doctors = [],
+}: {
+  user: User;
+  doctors?: DoctorOption[];
+}) => {
+  const doctorOptions = doctors?.length > 0 ? doctors : Doctors;
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
@@ -119,7 +128,7 @@ const RegisterForm = ({ user }: { user: User }) => {
             fieldType={FormFieldType.INPUT}
             control={form.control}
             name="name"
-            placeholder="Jayadip Sahoo"
+            placeholder="FirstName LastName"
             iconSrc="/assets/icons/user.svg"
             iconAlt="user"
           />
@@ -131,7 +140,7 @@ const RegisterForm = ({ user }: { user: User }) => {
               control={form.control}
               name="email"
               label="Email address"
-              placeholder="jdsgbmlr@gmail.com"
+              placeholder="email@domain.com"
               iconSrc="/assets/icons/email.svg"
               iconAlt="email"
             />
@@ -232,7 +241,7 @@ const RegisterForm = ({ user }: { user: User }) => {
             label="Primary care physician"
             placeholder="Select a physician"
           >
-            {Doctors.map((doctor, i) => (
+            {doctorOptions.map((doctor, i) => (
               <SelectItem key={doctor.name + i} value={doctor.name}>
                 <div className="flex cursor-pointer items-center gap-2">
                   <Image

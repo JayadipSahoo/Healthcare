@@ -4,6 +4,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Doctors } from "@/constants";
 import { getAppointment } from "@/lib/actions/appointment.actions";
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
 import { formatDateTime } from "@/lib/utils";
 
 const RequestSuccess = async ({
@@ -11,10 +12,17 @@ const RequestSuccess = async ({
   params: { userId },
 }: SearchParamProps) => {
   const appointmentId = (searchParams?.appointmentId as string) || "";
-  const appointment = await getAppointment(appointmentId);
+  const [appointment, dbDoctors] = await Promise.all([
+    getAppointment(appointmentId),
+    getAllDoctors(),
+  ]);
 
-  const doctor = Doctors.find(
-    (doctor) => doctor.name === appointment.primaryPhysician
+  const doctors =
+    dbDoctors?.length > 0
+      ? dbDoctors
+      : Doctors;
+  const doctor = doctors.find(
+    (d) => d.name === appointment.primaryPhysician
   );
 
   return (
@@ -50,14 +58,22 @@ const RequestSuccess = async ({
         <section className="request-details">
           <p>Requested appointment details: </p>
           <div className="flex items-center gap-3">
-            <Image
-              src={doctor?.image!}
-              alt="doctor"
-              width={100}
-              height={100}
-              className="size-6"
-            />
-            <p className="whitespace-nowrap">Dr. {doctor?.name}</p>
+            {doctor?.image ? (
+              <Image
+                src={doctor.image}
+                alt="doctor"
+                width={100}
+                height={100}
+                className="size-6 rounded-full object-cover"
+              />
+            ) : (
+              <div className="flex size-6 items-center justify-center rounded-full bg-dark-400 text-12-medium">
+                Dr
+              </div>
+            )}
+            <p className="whitespace-nowrap">
+              {doctor?.name ? `Dr. ${doctor.name}` : appointment.primaryPhysician}
+            </p>
           </div>
           <div className="flex gap-2">
             <Image

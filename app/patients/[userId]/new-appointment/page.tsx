@@ -1,10 +1,23 @@
 import Image from "next/image";
 
 import { AppointmentForm } from "@/components/forms/AppointmentForm";
+import { Doctors } from "@/constants";
 import { getPatient } from "@/lib/actions/patient.actions";
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
 
 const Appointment = async ({ params: { userId } }: SearchParamProps) => {
-  const patient = await getPatient(userId);
+  const [patient, dbDoctors] = await Promise.all([
+    getPatient(userId),
+    getAllDoctors(),
+  ]);
+
+  const doctors =
+    dbDoctors?.length > 0
+      ? dbDoctors.map((d: { name: string; image?: string }) => ({
+          name: d.name,
+          image: d.image,
+        }))
+      : Doctors;
 
   return (
     <div className="flex h-screen max-h-screen">
@@ -22,6 +35,7 @@ const Appointment = async ({ params: { userId } }: SearchParamProps) => {
             patientId={patient?.$id}
             userId={userId}
             type="create"
+            doctors={doctors}
           />
 
           <p className="copyright mt-10 py-12">© 2024 HealthPlus</p>

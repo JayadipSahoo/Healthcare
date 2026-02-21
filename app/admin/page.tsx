@@ -1,13 +1,17 @@
 import Image from "next/image";
 import Link from "next/link";
 
+import { AdminAppointmentsTable } from "@/components/AdminAppointmentsTable";
 import { StatCard } from "@/components/StatCard";
-import { columns } from "@/components/table/columns";
-import { DataTable } from "@/components/table/DataTable";
+import { Button } from "@/components/ui/button";
 import { getRecentAppointmentList } from "@/lib/actions/appointment.actions";
+import { getAllDoctors } from "@/lib/actions/doctor.actions";
 
 const AdminPage = async () => {
-  const appointments = await getRecentAppointmentList();
+  const [appointments, doctors] = await Promise.all([
+    getRecentAppointmentList(),
+    getAllDoctors(),
+  ]);
 
   return (
     <div className="mx-auto flex max-w-7xl flex-col space-y-14">
@@ -22,7 +26,19 @@ const AdminPage = async () => {
           />
         </Link>
 
-        <p className="text-16-semibold">Admin Dashboard</p>
+        <div className="flex items-center gap-4">
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/records" className="shad-gray-btn">
+              Patient Records
+            </Link>
+          </Button>
+          <Button variant="outline" size="sm" asChild>
+            <Link href="/admin/doctors" className="shad-gray-btn">
+              Add Doctor
+            </Link>
+          </Button>
+          <p className="text-16-semibold">Admin Dashboard</p>
+        </div>
       </header>
 
       <main className="admin-main">
@@ -54,7 +70,10 @@ const AdminPage = async () => {
           />
         </section>
 
-        <DataTable columns={columns} data={appointments.documents} />
+        <AdminAppointmentsTable
+          appointments={appointments.documents}
+          doctors={doctors ?? []}
+        />
       </main>
     </div>
   );

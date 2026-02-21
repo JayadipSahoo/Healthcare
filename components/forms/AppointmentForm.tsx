@@ -9,6 +9,8 @@ import { z } from "zod";
 
 import { SelectItem } from "@/components/ui/select";
 import { Doctors } from "@/constants";
+
+type DoctorOption = { name: string; image?: string };
 import {
   createAppointment,
   updateAppointment,
@@ -28,15 +30,18 @@ export const AppointmentForm = ({
   type = "create",
   appointment,
   setOpen,
+  doctors,
 }: {
   userId: string;
   patientId: string;
   type: "create" | "schedule" | "cancel";
   appointment?: Appointment;
   setOpen?: Dispatch<SetStateAction<boolean>>;
+  doctors?: DoctorOption[];
 }) => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const doctorOptions = doctors?.length ? doctors : Doctors;
 
   const AppointmentFormValidation = getAppointmentSchema(type);
 
@@ -149,16 +154,22 @@ export const AppointmentForm = ({
               label="Doctor"
               placeholder="Select a doctor"
             >
-              {Doctors.map((doctor, i) => (
+              {doctorOptions.map((doctor, i) => (
                 <SelectItem key={doctor.name + i} value={doctor.name}>
                   <div className="flex cursor-pointer items-center gap-2">
-                    <Image
-                      src={doctor.image}
-                      width={32}
-                      height={32}
-                      alt="doctor"
-                      className="rounded-full border border-dark-500"
-                    />
+                    {doctor.image ? (
+                      <Image
+                        src={doctor.image}
+                        width={32}
+                        height={32}
+                        alt="doctor"
+                        className="rounded-full border border-dark-500 object-cover"
+                      />
+                    ) : (
+                      <div className="flex size-8 items-center justify-center rounded-full border border-dark-500 bg-dark-400 text-12-medium">
+                        Dr
+                      </div>
+                    )}
                     <p>{doctor.name}</p>
                   </div>
                 </SelectItem>
